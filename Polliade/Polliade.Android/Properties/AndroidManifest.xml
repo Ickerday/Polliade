@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          android:versionCode="1"
+          android:versionName="1.0"
+          package="com.companyname.Polliade">
+  <uses-sdk android:minSdkVersion="21" android:targetSdkVersion="27" />
+
+  <application android:label="Polliade.Android">
+    <activity android:name="microsoft.identity.client.BrowserTabActivity">
+      <intent-filter>
+        <action android:name="android.intent.action.VIEW" />
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.BROWSABLE" />
+        <data android:scheme="msal2198fda9-fe5e-46ff-8097-8b4cbc51f865" android:host="auth" />
+      </intent-filter>
+    </activity>
+  </application>
+</manifest>
