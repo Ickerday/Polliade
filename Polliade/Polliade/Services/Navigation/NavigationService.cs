@@ -1,8 +1,8 @@
-﻿using Polliade.Services.UserAuth;
-using Polliade.ViewModels;
+﻿using Polliade.ViewModels;
 using Polliade.Views;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Xamarin.Forms;
 
@@ -13,19 +13,12 @@ namespace Polliade.Services.Navigation
         private readonly Dictionary<Type, Type> _pages = new Dictionary<Type, Type>
         {
             {typeof(UserDetailsViewModel), typeof(UserDetailsPage)},
-            {typeof(UserLoginViewModel), typeof(UserLoginPage)},
-            {typeof(UserSignupViewModel), typeof(UserSignupPage)},
+            {typeof(UserSigninViewModel), typeof(UserLoginPage)},
         };
 
         public async Task InitializeAsync()
         {
-            var user = UserAuthService.Instance.GetLoggedInUserAsync();
-            if (user != null)
-            {
-                await NavigateToAsync<UserDetailsViewModel>(user);
-                return;
-            }
-            await NavigateToAsync<UserLoginViewModel>();
+            await NavigateToAsync<UserDetailsViewModel>();
         }
 
         public Task NavigateToAsync<TViewModel>() where TViewModel : BaseViewModel =>
@@ -60,13 +53,14 @@ namespace Polliade.Services.Navigation
 
         private async Task InternalNavigateToAsync(Type viewModelType, object parameter)
         {
-            if (viewModelType == typeof(UserDetailsViewModel) || viewModelType == typeof(UserLoginViewModel) || viewModelType == typeof(UserSignupViewModel))
+            if (Application.Current.MainPage == null)
             {
                 var mainPage = new MainPage();
                 InitializeTabNavigation(mainPage);
                 Application.Current.MainPage = mainPage;
             }
-            else
+
+            if (_pages.Keys.Contains(viewModelType))
             {
                 var page = CreatePage(viewModelType);
                 await (page.BindingContext as BaseViewModel)?.InitializeAsync(parameter);
@@ -78,12 +72,10 @@ namespace Polliade.Services.Navigation
         private void InitializeTabNavigation(TabbedPage tabbedPage)
         {
             var details = CreatePage(typeof(UserDetailsViewModel));
-            var login = CreatePage(typeof(UserLoginViewModel));
-            var signup = CreatePage(typeof(UserSignupViewModel));
+            var login = CreatePage(typeof(UserSigninViewModel));
 
             tabbedPage.Children.Add(new NavigationPage(details));
             tabbedPage.Children.Add(new NavigationPage(login));
-            tabbedPage.Children.Add(new NavigationPage(signup));
         }
 
         private async Task InternalNavigateToModalAsync(Type viewModelType, object parameter)

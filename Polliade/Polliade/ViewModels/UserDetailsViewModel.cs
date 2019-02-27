@@ -1,7 +1,7 @@
-﻿using Polliade.Models;
+﻿using Microsoft.Identity.Client;
 using Polliade.Services.Navigation;
-using Polliade.Services.UserAuth;
-using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Xamarin.Forms;
 
@@ -11,29 +11,54 @@ namespace Polliade.ViewModels
     {
         private readonly INavigationService _navigationService;
 
-        public string Id { get; set; }
-        public string Name { get; set; }
-        public string Description { get; set; }
+        private string _id;
+        public string Id { get => _id; set => SetProperty(ref _id, value); }
+
+        private string _name;
+        public string Name { get => _name; set => SetProperty(ref _description, value); }
+
+        private string _description;
+        public string Description { get => _description; set => SetProperty(ref _description, value); }
 
         public UserDetailsViewModel()
         {
+            Title = "Details";
             _navigationService = DependencyService.Resolve<INavigationService>();
         }
 
-        public override Task InitializeAsync(object parameter)
+        public override async Task InitializeAsync(object parameter)
         {
-            if (!(parameter is User user))
-                throw new ArgumentException(nameof(parameter));
-
-            Id = user.Id;
-            Name = user.Name;
-            Description = user.Description;
-
-            return base.InitializeAsync(parameter);
+            if (!(parameter is AuthenticationResult result))
+                await _navigationService.NavigateToAsync<UserSigninViewModel>();
+            else
+            {
+                Id = result.Account.HomeAccountId.ToString();
+                Name = result.Account.Username;
+                Description = result.Account.ToString();
+            }
+            await base.InitializeAsync(parameter);
         }
 
-        private async Task LogoutButton_ClickedAsync(object sender, EventArgs e) =>
-            await UserAuthService.Instance.Logout().ContinueWith(async _ =>
-                await _navigationService.NavigateToAsync<UserLoginViewModel>());
+        public async Task Logout()
+        {
+            var accounts = await App.AuthService.PCA.GetAccountsAsync();
+            while (accounts.Any())
+            {
+                await App.AuthService.PCA.RemoveAsync(accounts.FirstOrDefault());
+                accounts = await App.AuthService.PCA.GetAccountsAsync();
+            }
+            await _navigationService.NavigateToAsync<UserSigninViewModel>();
+        }
+
+        private IAccount GetAccountByPolicy(IEnumerable<IAccount> accounts, string policy)
+        {
+            foreach (var account in accounts)
+            {
+                string userIdentifier = account.HomeAccountId.ObjectId.Split('.')[0];
+                if (userIdentifier.EndsWith(policy.ToLower()))
+                    return account;
+            }
+            return null;
+        }
     }
 }

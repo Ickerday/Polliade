@@ -2,9 +2,12 @@
 
 namespace Polliade.ViewModels
 {
-    public class UserLoginViewModel : BaseViewModel
+    public class UserSigninViewModel : BaseViewModel
     {
-        public UserLoginViewModel() { }
+        public UserSigninViewModel()
+        {
+            Title = "Sign in";
+        }
 
         public override Task InitializeAsync(object parameter)
         {

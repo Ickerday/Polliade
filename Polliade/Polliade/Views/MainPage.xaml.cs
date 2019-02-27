@@ -1,4 +1,5 @@
-﻿using Xamarin.Forms;
+﻿using Polliade.Services.Navigation;
+using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
 namespace Polliade.Views
@@ -6,7 +7,11 @@ namespace Polliade.Views
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class MainPage : TabbedPage
     {
-        public MainPage() =>
+        private readonly INavigationService _navigationService;
+
+        public MainPage()
+        {
             InitializeComponent();
+        }
     }
 }
