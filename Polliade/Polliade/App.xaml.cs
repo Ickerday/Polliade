@@ -1,4 +1,4 @@
-﻿using Fusillade;
+using Fusillade;
 using Polliade.Services.Navigation;
 using System.Threading.Tasks;
 using Xamarin.Forms;
@@ -12,12 +12,13 @@ namespace Polliade
         public App()
         {
             InitializeComponent();
+
             DependencySetup.Initialize();
         }
 
         protected override async void OnStart()
         {
-            Akavache.Registrations.Start("Polliade");
+            Akavache.Registrations.Start(nameof(Polliade));
             await InitializeNavigation();
         }
 

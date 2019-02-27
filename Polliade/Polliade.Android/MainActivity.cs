@@ -1,6 +1,8 @@
 ﻿using Android.App;
+using Android.Content;
 using Android.Content.PM;
 using Android.OS;
+using Microsoft.Identity.Client;
 using System;
 using Xamarin.Forms;
 using Xamarin.Forms.Platform.Android;
@@ -29,6 +31,12 @@ namespace Polliade.Droid
             catch (Exception ex)
             {
             }
+        }
+
+        protected override void OnActivityResult(int requestCode, Result resultCode, Intent data)
+        {
+            AuthenticationContinuationHelper.SetAuthenticationContinuationEventArgs(requestCode, resultCode, data);
+            base.OnActivityResult(requestCode, resultCode, data);
         }
     }
 }
