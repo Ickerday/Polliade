@@ -21,25 +21,27 @@ namespace Polliade.Views
             _navigationService = DependencyService.Resolve<INavigationService>();
         }
 
-        private async void OnLoginButtonClicked(object sender, EventArgs e)
+        private async void OnSignupButtonClicked(object sender, EventArgs e)
         {
             try
             {
-                var accounts = await App.AuthService.PCA.GetAccountsAsync();
-                var result = await App.AuthService.PCA
-                    .AcquireTokenAsync(
-                    scopes: AppSettings.Scopes,
-                    account: accounts.FirstOrDefault(),
-                    behavior: UIBehavior.SelectAccount,
-                    extraQueryParameters: string.Empty,
-                    extraScopesToConsent: null,
-                    authority: AppSettings.Authority);
+                var result = await App.AuthService.PCA.AcquireTokenAsync(
+                    new[] { "" },
+                    string.Empty,
+                    UIBehavior.SelectAccount,
+                    string.Empty,
+                    null,
+                    AppSettings.GetAuthorityForPolicy(Policy.SignUpSignIn),
+                    App.UIParent);
+
+                if (result == null)
+                    throw new ArgumentException(nameof(result));
 
                 await _navigationService.NavigateToAsync<UserDetailsViewModel>(result);
             }
             catch (MsalException ex)
             {
-                if (ex.Message != null && ex.Message.Contains("AADB2C90118"))
+                if (!string.IsNullOrEmpty(ex.Message) && ex.Message.Contains("AADB2C90118"))
                     await OnForgotPassword();
 
                 if (ex.ErrorCode != "authentication_canceled")
@@ -59,7 +61,7 @@ namespace Polliade.Views
                     behavior: UIBehavior.SelectAccount,
                     extraQueryParameters: string.Empty,
                     extraScopesToConsent: null,
-                    authority: AppSettings.Authority);
+                    authority: AppSettings.GetAuthorityForPolicy(Policy.ResetPassword));
             }
             catch (MsalException)
             {

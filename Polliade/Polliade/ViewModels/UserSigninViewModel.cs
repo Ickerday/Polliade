@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using Microsoft.Identity.Client;
+using System;
+using Xamarin.Forms;
 
 namespace Polliade.ViewModels
 {
@@ -9,10 +11,24 @@ namespace Polliade.ViewModels
             Title = "Sign in";
         }
 
-        public override Task InitializeAsync(object parameter)
+        public async void SignInButtonClicked()
         {
-            // TODO
-            return base.InitializeAsync(parameter);
+            try
+            {
+                var result = await App.AuthService.PCA.AcquireTokenAsync(
+                    AppSettings.Scopes,
+                    string.Empty,
+                    UIBehavior.SelectAccount,
+                    string.Empty,
+                    null,
+                    AppSettings.GetAuthorityForPolicy(Policy.SignUpSignIn));
+                if (result == null)
+                    throw new ArgumentException(nameof(result));
+            }
+            catch (Exception ex)
+            {
+                await Application.Current.MainPage.DisplayAlert("Can't log in", ex.Message, "Ok");
+            }
         }
     }
 }

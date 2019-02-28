@@ -27,10 +27,10 @@ namespace Polliade.Droid
                 Forms.Init(this, savedInstanceState);
 
                 LoadApplication(new App());
+                App.UIParent = new UIParent(this, UIParent.IsSystemWebviewAvailable()); ;
             }
             catch (Exception ex)
-            {
-            }
+            { }
         }
 
         protected override void OnActivityResult(int requestCode, Result resultCode, Intent data)

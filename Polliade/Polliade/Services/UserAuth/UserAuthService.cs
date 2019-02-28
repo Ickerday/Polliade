@@ -16,9 +16,9 @@ namespace Polliade.Services.UserAuth
 
         internal UserAuthService()
         {
-            PCA = new PublicClientApplication(AppSettings.ApplicationId, AppSettings.Authority)
+            PCA = new PublicClientApplication(AppSettings.ApplicationId)
             {
-                RedirectUri = $"msal{AppSettings.ApplicationId}://auth",
+                RedirectUri = AppSettings.msalRedirectUrl,
                 ValidateAuthority = false,
             };
         }

@@ -14,13 +14,14 @@ namespace Polliade
 {
     public partial class App : Application
     {
-        public static UIParent UiParent;
+        public static UIParent UIParent;
 
         public static UserAuthService AuthService = new UserAuthService();
         private readonly INavigationService _navigationService;
 
         public App()
         {
+
             InitializeComponent();
             DependencySetup.Initialize();
 
@@ -31,7 +32,8 @@ namespace Polliade
         {
             //Akavache.Registrations.Start(nameof(Polliade));
             await _navigationService.InitializeAsync();
-            await CheckAuth();
+
+            await GetAuthOrRedirectToSignin();
         }
 
         protected override void OnSleep() { }
@@ -39,7 +41,7 @@ namespace Polliade
         protected override void OnResume() { }
 
 
-        private async Task CheckAuth()
+        private async Task GetAuthOrRedirectToSignin()
         {
             try
             {
@@ -48,7 +50,7 @@ namespace Polliade
                 Debug.WriteLine(accounts);
                 var result = await AuthService.PCA
                     .AcquireTokenSilentAsync(AppSettings.Scopes, accounts.FirstOrDefault(),
-                    AppSettings.Authority + AppSettings.PolicySignUpSignIn, false);
+                    AppSettings.GetAuthorityForPolicy(Policy.SignUpSignIn), false);
 
                 if (result == null)
                     throw new ArgumentException(nameof(result));

@@ -10,9 +10,10 @@
 
             <Entry Placeholder="Password" />
 
-            <Button Text="Sign in" />
+            <!--<Button Text="Sign in" />-->
 
             <Button Text="Sign up" 
+                    Clicked="OnSignupButtonClicked"
                     Margin="0, 20" />
 
         </StackLayout>
